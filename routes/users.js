@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var fs = require('fs');
-/* GET users listing. */
+
 router.post('/register', function(req, res, next) {
   let userDetails = JSON.stringify(req.body);
   fs.appendFile("UserDetails.txt", userDetails +"\r", function(err) {
@@ -97,26 +97,28 @@ router.get('/getAllContacts', function(req, res, next) {
 });
 
 router.post('/editUser', function(req, res, next) {
-  fs.readFile('UserDetails.txt','utf8', function(err, data) {
+  var data = fs.readFileSync('UserDetails.txt', 'utf-8');
   let string_data = JSON.stringify(data);
-  let json_data = JSON.parse(string_data);
-  let obj1 = json_data.split("\r");
-  let found_obj;
- for(var attributename of obj1){
-   if(attributename.length >0) {
-     let  json_obj = JSON.parse(attributename);
-     if(json_obj['emailid'] === req.body.emailid ) {
-      found_obj = json_obj;
-      var newValue = data.replace(JSON.stringify(found_obj), JSON.stringify(req.body));
-      fs.writeFile('UserDetails.txt', newValue, 'utf-8', function (err) {
-        if (err) throw err;
-      });
+    let json_data = JSON.parse(string_data);
+    let obj1 = json_data.split("\r");
+    let found_obj;
+   for(var attributename of obj1){
+     if(attributename.length >0) {
+       let  json_obj = JSON.parse(attributename);
+       if(json_obj['emailid'] === req.body.emailid ) {
+        found_obj = json_obj;
+        var newValue = data.replace(JSON.stringify(found_obj), JSON.stringify(req.body));}}}
 
-      }  
-   }
-          }
-        });
+  fs.writeFileSync('UserDetails.txt', newValue, 'utf-8', function (err) {})
+    res.json({"message":"Edited successfully !!"}) 
+})
 
-});
+
+router.post('/delete', function(req, res, next) {
+  var data = fs.readFileSync('UserDetails.txt', 'utf-8');
+  var newValue = data.replace(JSON.stringify(req.body), '');
+  fs.writeFileSync('UserDetails.txt', newValue, 'utf-8', function (err) {})
+    res.json({"message":"Deleted successfully !!"}) 
+})
 
 module.exports = router;
